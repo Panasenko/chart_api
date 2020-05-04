@@ -1,39 +1,72 @@
-let express = require('express');
-let app = express();
+const express = require('express');
+const app = express();
+const fs = require('fs');
+const { CanvasRenderService } = require('chartjs-node-canvas');
 
-let fs = require('fs');
+const width = 400;
+const height = 400;
 
-let JSDOM = require('jsdom').JSDOM;
-
-let jsdom = new JSDOM('<body><div id="container"></div></body>', {runScripts: 'dangerously'});
-
-let window = jsdom.window;
-
-
-let anychart = require('anychart')(window);
-let anychartExport = require('anychart-nodejs')(anychart);
-
-let chart = anychart.pie([10, 20, 7, 18, 30]);
-chart.bounds(0, 0, 800, 600);
-chart.container('container');
-chart.draw();
- 
-anychartExport.exportTo(chart, 'png').then(function(image) {
-  fs.writeFile('charts/anyc678687678hart.png', image, function(fsWriteError) {
-    if (fsWriteError) {
-      console.log(fsWriteError);
-    } else {
-      console.log('Complete');
-    }
+const chartCallback = (ChartJS) => {
+  // Global config example: https://www.chartjs.org/docs/latest/configuration/
+  ChartJS.defaults.global.elements.rectangle.borderWidth = 2;
+  // Global plugin example: https://www.chartjs.org/docs/latest/developers/plugins.html
+  ChartJS.plugins.register({
+    // plugin implementation
   });
-}, function(generationError) {
-  console.log(generationError);
-});
+  // New chart type example: https://www.chartjs.org/docs/latest/developers/charts.html
+  ChartJS.controllers.MyType = ChartJS.DatasetController.extend({
+    // chart implementation
+  });
+};
+const canvasRenderService = new CanvasRenderService(width, height, chartCallback);
 
-app.get('/', function (req, res) {
-  res.json({})
-});
+(async () => {
+  const configuration = {
+    type: 'bar',
+    data: {
+      labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+      datasets: [{
+        label: '# of Votes',
+        data: [12, 19, 3, 5, 2, 3],
+        backgroundColor: [
+          'rgba(255, 99, 132, 0.2)',
+          'rgba(54, 162, 235, 0.2)',
+          'rgba(255, 206, 86, 0.2)',
+          'rgba(75, 192, 192, 0.2)',
+          'rgba(153, 102, 255, 0.2)',
+          'rgba(255, 159, 64, 0.2)'
+        ],
+        borderColor: [
+          'rgba(255,99,132,1)',
+          'rgba(54, 162, 235, 1)',
+          'rgba(255, 206, 86, 1)',
+          'rgba(75, 192, 192, 1)',
+          'rgba(153, 102, 255, 1)',
+          'rgba(255, 159, 64, 1)'
+        ],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      scales: {
+        yAxes: [{
+          ticks: {
+            beginAtZero: true,
+            callback: (value) => '$' + value
+          }
+        }]
+      }
+    }
+  };
+  const image = await canvasRenderService.renderToBuffer(configuration);
+  const dataUrl = await canvasRenderService.renderToDataURL(configuration);
+  const stream = canvasRenderService.renderToStream(configuration);
 
+  fs.writeFileSync(`chart.png`, image);
+})();
+
+
+app.get('/static', express.static('charts'));
 
 app.listen(3000, function () {
   console.log('Export server listening on port 3000!')
