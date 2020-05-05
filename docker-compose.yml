@@ -5,6 +5,6 @@ services:
    build: .
    container_name: chart
    ports:
-   - "5000:5000"
+   - "3000:3000"
    volumes:
    - .:/usr/src/app
