@@ -1,7 +1,10 @@
 const express = require('express');
-const app = express();
 const fs = require('fs');
 const { CanvasRenderService } = require('chartjs-node-canvas');
+
+const app = express();
+
+
 
 const width = 400;
 const height = 400;
@@ -22,51 +25,39 @@ const canvasRenderService = new CanvasRenderService(width, height, chartCallback
 
 (async () => {
   const configuration = {
-    type: 'bar',
+    // The type of chart we want to create
+    type: 'line',
+
+    // The data for our dataset
     data: {
-      labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+      labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
       datasets: [{
-        label: '# of Votes',
-        data: [12, 19, 3, 5, 2, 3],
-        backgroundColor: [
-          'rgba(255, 99, 132, 0.2)',
-          'rgba(54, 162, 235, 0.2)',
-          'rgba(255, 206, 86, 0.2)',
-          'rgba(75, 192, 192, 0.2)',
-          'rgba(153, 102, 255, 0.2)',
-          'rgba(255, 159, 64, 0.2)'
-        ],
-        borderColor: [
-          'rgba(255,99,132,1)',
-          'rgba(54, 162, 235, 1)',
-          'rgba(255, 206, 86, 1)',
-          'rgba(75, 192, 192, 1)',
-          'rgba(153, 102, 255, 1)',
-          'rgba(255, 159, 64, 1)'
-        ],
-        borderWidth: 1
-      }]
+        label: 'My First dataset',
+        backgroundColor: 'rgb(220,165,20)',
+        borderColor: 'rgb(255, 99, 132)',
+        data: [50, 10, 5, 2, 20, 30, 45]
+      },
+        {
+          label: 'My First dataset',
+          borderColor: 'rgba(92, 84, 84, 0.41)',
+          data: [50, 10, 8, 24, 20, 54, 45],
+          fill: false,
+          borderDash: [5, 5],
+          pointBackgroundColor: 'rgba(0, 117, 255, 0.5)',
+        }
+      ]
     },
-    options: {
-      scales: {
-        yAxes: [{
-          ticks: {
-            beginAtZero: true,
-            callback: (value) => '$' + value
-          }
-        }]
-      }
-    }
+
+    // Configuration options go here
+    options: {}
   };
   const image = await canvasRenderService.renderToBuffer(configuration);
-  const dataUrl = await canvasRenderService.renderToDataURL(configuration);
-  const stream = canvasRenderService.renderToStream(configuration);
 
-  fs.writeFileSync(`chart.png`, image);
+  fs.writeFileSync(`image/chart.png`, image);
 })();
 
 
-app.get('/static', express.static('charts'));
+app.use('/static', express.static('image'));
 
 app.listen(3000, function () {
   console.log('Export server listening on port 3000!')
