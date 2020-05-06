@@ -10,16 +10,8 @@ class Builder {
     }
 
     chartCallback(ChartJS){
-        // Global config example: https://www.chartjs.org/docs/latest/configuration/
         ChartJS.defaults.global.elements.rectangle.borderWidth = 2;
-        // Global plugin example: https://www.chartjs.org/docs/latest/developers/plugins.html
-        ChartJS.plugins.register({
-            // plugin implementation
-        });
-        // New chart type example: https://www.chartjs.org/docs/latest/developers/charts.html
-        ChartJS.controllers.MyType = ChartJS.DatasetController.extend({
-            // chart implementation
-        })
+        ChartJS.defaults.global.legend.position = 'bottom';
     }
 
     async buildChart(){
@@ -29,7 +21,7 @@ class Builder {
 
             // The data for our dataset
             data: {
-                labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+                labels: ['2013-02-08', '2013-02-09', '2013-02-10', '2013-02-11', '2013-02-12', '2013-02-13', '2013-02-14'],
                 datasets: [{
                     label: 'My First dataset',
                     backgroundColor: 'rgb(220,165,20)',
@@ -48,13 +40,29 @@ class Builder {
             },
 
             // Configuration options go here
-            options: {}
+            options: {
+                title: {
+                    display: true,
+                    text: 'Динаміка зміни курсів валют'
+                },
+                scales: {
+                    xAxes:  [{
+                        type: 'time',
+                        time: {
+                            displayFormats: {
+                                quarter: 'MM D'
+                            }
+                        }
+                    }]
+                }
+            }
         };
-
 
          return await File.saveFile(await this.canvasRenderService.renderToBuffer(configuration), configuration.type, 'png')
 
     }
+
+
 
 
 
