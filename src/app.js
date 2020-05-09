@@ -17,6 +17,10 @@ app.post('/build_chart', (req, res) => {
     res.json(req.body)
 })
 
+app.get('/', async (req, res) => {
+    res.send("Hello world")
+});
+
 app.get('/image', async (req, res) => {
     let chart_url = await chart.buildChart()
     res.send(`http://${app.get('host')}:${app.get('port')}/image/${chart_url}`)
