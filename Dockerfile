@@ -4,7 +4,7 @@ WORKDIR /usr/src/app
 
 COPY . .
 
-RUN mkdir image
+# RUN mkdir image
 
 RUN apt-get update && apt-get upgrade -y
 
