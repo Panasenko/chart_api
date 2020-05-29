@@ -1,4 +1,5 @@
-const fs = require('fs')
+const fs = require('fs-extra')
+const sharp = require('sharp')
 const moment = require('moment')
 
 class SaveFile {
@@ -16,14 +17,21 @@ class SaveFile {
 
             .then(folder_name => `${folder_name}/${this.get_fileName(type_chart, type_file)}`)
 
-            .then(file_path => {
-                    fs.writeFileSync('image/' + file_path, buffer)
+            .then(async file_path => {
+                     await sharp(buffer)
+                        .resize(400, 300)
+                        .jpeg({
+                            quality: 70
+                        })
+                        .toFile('image/' + file_path);
 
                     return file_path
+
                 },
                 err => {
                     console.log(err)
                 })
+
             .catch(err => console.log(err))
     }
 
